@@ -183,6 +183,7 @@ public class KettleService {
         }
     }
 
+
     public void test() {
         List<KettleFileList> lists = kettleFileListMapper.selectSelective(new KettleFileList());
         lists.forEach(this::exe);
@@ -191,5 +192,6 @@ public class KettleService {
     public void exe(KettleFileList kettleFileList) {
         System.err.println("aaaaa" + new Date());
     }
+
 
 }

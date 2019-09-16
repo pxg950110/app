@@ -18,7 +18,6 @@ import org.pentaho.di.core.logging.LoggingBuffer;
  */
 public class KettleLogStoreLogInfo {
 
-
     /**
      * 通过LogChannelId 获取日志
      * @param logChannelId

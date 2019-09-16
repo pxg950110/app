@@ -13,7 +13,6 @@ package com.pxg.app.core.config;
  * @mail pxg950110@163.com
  * @description 开始运行
  */
-
 public class AppRunInit {
 
 

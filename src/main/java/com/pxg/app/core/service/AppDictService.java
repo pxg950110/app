@@ -31,6 +31,10 @@ public class AppDictService {
 
     public Map<Object, Object> getAppDictByClassType(String classType) {
         try {
+            //如果classType 为空或null返回错误信息
+            if (classType == null || "".equals(classType.trim())) {
+                return InterfaceReturnInformation(ERROR_CODE, "参数不为空", ERROR_MESSAGE);
+            }
             AppDict record = new AppDict(classType, 1);
             List<AppDict> appDicts = appDictMapper.selectSelective(record);
 

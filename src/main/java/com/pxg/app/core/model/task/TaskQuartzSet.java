@@ -88,6 +88,22 @@ public class TaskQuartzSet implements Serializable {
      */
     private Date createTime;
 
+
+    /**
+     * This field corresponds to the database column km_task.task_quartz_set.class_type_id
+     */
+    @ApiModelProperty("任务类别 1 上传文件 2 资源库")
+    private Integer classTypeId;
+
+
+    public Integer getClassTypeId() {
+        return classTypeId;
+    }
+
+    public void setClassTypeId(Integer classTypeId) {
+        this.classTypeId = classTypeId;
+    }
+
     public Integer getCronId() {
         return cronId;
     }
@@ -271,5 +287,20 @@ public class TaskQuartzSet implements Serializable {
         this.createTime = createTime;
     }
 
-
+    @Override
+    public String toString() {
+        return "TaskQuartzSet{" +
+                "id=" + id +
+                ", jobId=" + jobId +
+                ", jobTypeId=" + jobTypeId +
+                ", startPlanTime=" + startPlanTime +
+                ", nextPlanTime=" + nextPlanTime +
+                ", status=" + status +
+                ", planTimes=" + planTimes +
+                ", cronId=" + cronId +
+                ", cronText='" + cronText + '\'' +
+                ", createTime=" + createTime +
+                ", classTypeId=" + classTypeId +
+                '}';
+    }
 }

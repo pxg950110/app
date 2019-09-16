@@ -40,4 +40,5 @@ public interface AppDictMapper {
      */
     int update(@Param("record") AppDict record);
 
+
 }

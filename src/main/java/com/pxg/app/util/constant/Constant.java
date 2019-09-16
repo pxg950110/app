@@ -26,6 +26,7 @@ public class Constant {
     /**
      * 定义code
      * 200  返回成功 信息
+     * 300  返回数据已存在
      * 500 返回错误信息
      * 401 返回警告信息
      */
@@ -36,8 +37,10 @@ public class Constant {
     public static final long EXPIRE_TIME = 60 * 60 * 1000;
     public static final String SUCCESS_MESSAGE = "成功";
     public static final String EXIST_MESSAGE = "数据已存在";
+    public static final String WARN_MESSAGE = "警告信息";
     public static final String ERROR_MESSAGE = "失败";
 
+    public static final String aa = "";
 
     //过期时间60分钟
 //    public  static final longEXPIRE_TIME = 60*60*1000;
@@ -46,7 +49,10 @@ public class Constant {
     /**
      * 接口返回信息
      */
-    public static Map<Object, Object> InterfaceReturnInformation(int code, Object object, Object message) {
+    public static Map<Object, Object> InterfaceReturnInformation(int code,//
+                                                                 Object object,
+                                                                 //
+                                                                 Object message) {
         Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("code", code);
         map.put("message", message);
@@ -64,4 +70,15 @@ public class Constant {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return simpleDateFormat.format(date1);
     }
+
+    /**
+     * 返回时间格式 yyyy-MM-dd
+     * @param date
+     * @return yyyy-MM-dd
+     */
+    public static String getDateString(Date date) {
+        return new SimpleDateFormat("yyyy-MM-dd").format(date);
+    }
+
+    
 }

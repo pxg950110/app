@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ public class AppDictApi {
 
     @PostMapping("/class/all")
     @ApiOperation("通过分类获取字典")
-    public Map<Object, Object> getAppDictByClassType(String classType) {
+    public Map<Object, Object> getAppDictByClassType(@RequestParam String classType) {
         return appDictService.getAppDictByClassType(classType);
     }
 }

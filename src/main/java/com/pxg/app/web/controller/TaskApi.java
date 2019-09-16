@@ -42,8 +42,13 @@ public class TaskApi {
         return taskServer.getCronAll(status);
     }
 
+    /**
+     * 每个任务只允许设置一次定时策略
+     * @param taskQuartzSet
+     * @return
+     */
     //注册定时任务
-    @ApiOperation("注册定时任务")
+    @ApiOperation("注册单挑定时任务")
     @PostMapping("/quartz/set/add")
     public Map<Object, Object> addTaskQuartzSet(@RequestBody TaskQuartzSet taskQuartzSet) {
         return taskServer.addTaskQuartzSet(taskQuartzSet);
