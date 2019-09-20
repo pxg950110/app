@@ -90,3 +90,67 @@ fee_detail.OrderNo=odoct_order.OrderNo
 and fee_detail.OrderSubNo=odoct_order.OrderSubNo
 left join  dbo.regist_visit visit  on visit.VisitNo=fee_detail.VisitNo
 left join  dbo.obill_master obill_master on obill_master.oBillID=visit.oBillID;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select
+--
+-- 机构标识	organization_id	数字	64	必填	复合主键；医疗机构在采集系统的唯一识别码
+1 as organization_id,
+-- 诊断ID	diagnose_no	字符串	36	必填	复合主键；患者医院内部唯一诊断ID
+convert(varchar(50),diag.VisitNo)+'_'+
+    convert(varchar(50),diag.DiagNo),
+-- 患者证件类型	idcard_type	字符串	16	必填	患者识别码，与患者信息表进行关联
+'-' as idcard_type,
+-- 患者证件号	idcard_number	字符串	64	必填
+'-' as idcard_number,
+-- 就诊流水号	visit_sn	字符串	36	必填
+diag.VisitNo as visit_sn,
+-- 修改标志	modify_flag	字符串	1	必填	复合主键；0：正常（应填默认）；1：撤销
+'-' as modify_flag,
+-- 诊断日期时间	diag_time	日期时间		必填
+
+-- 诊断方法代码	diag_method	字符串	2	必填	01：西医；02：中医
+
+-- 诊断标准代码	diag_stand	字符串	2	必填	01：ICD-10；02：国标-95
+
+-- 诊断类别代码	diag_category	字符串	2	必填	填写“疾病诊断类别字典表”代码
+
+-- 病证区别代码	symptom_cate	字符串	2	必填	01：病；02：证；诊断方法代码为02时必须填写，
+
+-- 诊断方法代码为01时填写填写ASCII十进制值为45的字符串
+
+-- 证对应病ID	malady_disease_id	字符串	36	必填	诊断方法代码为02与诊断区别代码为02必填，其他填写ASCII十进制值为45的字符串
+
+-- 诊断主次代码	diag_major_code	字符串	2	必填	01：主要诊断；02：次要诊断
+
+-- 诊断顺序	diag_order	整数	2	应填	按照诊断的先后顺序进行排序，排序含主要诊断
+diag.DiagNo as diag_order,
+-- 诊断代码	diag_code	字符串	32	必填	填写医院业务系统实际的诊断代码
+diag.DiagCode as diag_code,
+-- 诊断名称	diag_name	字符串	72	必填
+diag.DiagDesc as diag_name,
+-- 是否疑诊	suspect_diag_flag	字符串	2	必填	01：疑诊；02：非疑诊
+
+-- 诊断类型	diag_type	字符串	1	应填	1：初步诊断；2：修正诊断；3：确诊诊断
+
+-- 修改时间	update_time	日期时间		必填	必须使用医院前置机中的数据库时间
+'-' as update_time
+from dbo.oDoct_Diag diag ;
+
