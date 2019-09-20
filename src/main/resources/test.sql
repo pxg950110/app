@@ -154,3 +154,74 @@ diag.DiagDesc as diag_name,
 '-' as update_time
 from dbo.oDoct_Diag diag ;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select
+
+--        机构标识	organization_id	数字	64	必填	复合主键；医疗机构在采集系统的唯一识别码
+1  as organization_id,
+--     结算记录ID	settlement_no	字符串	36	必填	复合主键；结算记录主表的院内唯一结算主键
+obill_master.oBillID as settlement_no,
+--     患者证件类型	idcard_type	字符串	16	必填	患者识别码，与患者信息表进行关联
+'-' as idcard_type,
+--     患者证件号	idcard_number	字符串	64	必填
+'-' as idcard_number,
+--     就诊流水号	visit_sn	字符串	36	必填
+visit.VisitNo as visit_sn,
+--     结算发票号	settle_invoice_no	字符串	200	必填	费用结算对应的发票号，一次结算多张发票，使用“|”（ASCII十进制值为124）对多张发票进行分隔，无数据填写ASCII十进制值为45的字符串
+(select   ( STUFF(( SELECT '|'+InvoiceNo FROM obill_invoice WHERE oBillID = obill.oBillID FOR XML PATH('')
+                  ), 1, 1, '') )
+ from obill_invoice  obill  where    oBillID =obill_master.oBillID
+ group by  oBillID ) as settle_invoice_no,
+--     收费场景代码	charge_scene_flag	字符串	1	必填	1：挂号时产生费用；2：门诊收费产生费用
+'' as charge_scene_flag,
+--     记录收费状态	charge_state	字符串	1	必填	1：收费；2：退费
+'' as charge_state,
+--     费用结算时间	charge_time	日期时间		必填	收费为收费结算时间，退费为退费结算时间
+obill_master.FeeDate as charge_time ,
+--     患者来源属性	patient_source	字符串	6	必填	填写“患者来源属性字典表”末级字典代码
+'-' as patient_source,
+--     医疗付费方式代码	medical_pay_method	字符串	2	必填	CV07.10.005代码
+case obill_master.FeeType when '玉树居民' then '02'
+                          when '玉树慢病' then '08'
+                          when '玉树农合' then '03'
+                          when '玉树职工' then   '01'
+                          when '自费' then '07'
+                          else '99' end as medical_pay_method,
+--     费用结算总金额	charge_total	浮点	12,4	必填	单位：元；收费显示正数，退费显示负数
+(select  sum(Cost)
+ from obill_invoice  obill  where    oBillID =obill_master.oBillID
+ group by  oBillID) as charge_total,
+--     个人承担费用金额	self_pay	浮点	10,2	应填	单位：元
+(select  sum(Fee)
+from obill_invoice  obill  where    oBillID =obill_master.oBillID
+group by  oBillID) as self_pay,
+--     结算人员编号	billing_staff_no	字符串	36	必填
+obill_master.OperatorNo  as billing_staff_no,
+--     结算人员姓名	billing_staff_name	字符串	50	必填
+(select G_B_Worker.Name from G_B_Worker where obill_master.OperatorNo=WorkerID ) as billing_staff_name,
+--     修改标志	modify_flag	字符串	1	必填	0：正常（应填默认）；1：撤销
+'-' as modify_flag,
+--     修改时间	update_time	日期时间		必填	必须使用医院前置机中的数据库时间
+'-' as update_time
+from obill_master obill_master
+left join  regist_visit visit on obill_master.oBillID=visit.oBillID;
+
+
+
+
+
