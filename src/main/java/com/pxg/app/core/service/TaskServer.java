@@ -5,13 +5,12 @@ import com.pxg.app.core.mapper.appmapper.TaskCronMapper;
 import com.pxg.app.core.mapper.appmapper.TaskQuartzSetMapper;
 import com.pxg.app.core.model.task.TaskCron;
 import com.pxg.app.core.model.task.TaskQuartzSet;
+import com.pxg.app.core.modelutil.KettleFileListAll;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.pxg.app.util.constant.Constant.*;
 
@@ -162,4 +161,54 @@ public class TaskServer {
 
         return result;
     }
+
+
+    public Map<Object, Object> setKettleQuartzByList(List<KettleFileListAll> kettleFileListAlls,
+                                                     Date startPlanTime,
+                                                     String cornText,
+                                                     int classTypeId) {
+        log.error(String.valueOf(kettleFileListAlls.size()));
+        int errorCount = 0;
+        int successCount = 0;
+        List<Integer> errorlists = new ArrayList<>();
+        List<Integer> successlists = new ArrayList<>();
+        //设置定时任务
+        for (KettleFileListAll item : kettleFileListAlls) {
+            try {
+                TaskQuartzSet quartzSet = new TaskQuartzSet();
+                quartzSet.setClassTypeId(classTypeId);
+                quartzSet.setJobId(item.getKettleFileList().getId());
+                //查询是否已经设置
+                List<TaskQuartzSet> taskQuartzSet = taskQuartzSetMapper.select(quartzSet);
+                //判断是否存在
+                if (taskQuartzSet.size() > 0) {
+                    errorCount += 1;
+                    errorlists.add(item.getKettleFileList().getId());
+                    continue;
+                }
+                TaskQuartzSet taskQuartzSet2 = new TaskQuartzSet();
+                taskQuartzSet2.setJobId(item.getKettleFileList().getId());
+                taskQuartzSet2.setJobTypeId(item.getKettleFileList().getJobTypeId());
+                taskQuartzSet2.setStatus(1);
+                taskQuartzSet2.setStartPlanTime(startPlanTime);
+                taskQuartzSet2.setCronId(0);
+                taskQuartzSet2.setCronText(cornText);
+                taskQuartzSet2.setClassTypeId(classTypeId);
+                taskQuartzSet2.setCreateTime(new Date());
+                taskQuartzSetMapper.insert(taskQuartzSet2);
+                successCount += 1;
+                successlists.add(item.getKettleFileList().getId());
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorCount += 1;
+            }
+        }
+        Map<Object, Object> map = new HashMap<>();
+        map.put("exsitCount", errorCount);
+        map.put("exsitList", errorlists);
+        map.put("successCount", successCount);
+        map.put("successlist", successlists);
+        return InterfaceReturnInformation(SUCCESS_CODE, map, SUCCESS_MESSAGE);
+    }
+
 }

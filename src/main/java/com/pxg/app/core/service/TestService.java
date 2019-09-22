@@ -1,8 +1,8 @@
 package com.pxg.app.core.service;
 
-import com.pxg.app.util.kettle.KettleInit;
-import com.pxg.app.util.rabbit.RabbitProducer;
-import org.pentaho.di.core.exception.KettleException;
+import com.pxg.app.core.mapper.appmapper.KettleFileListMapper;
+import com.pxg.app.core.mapper.mysqlappmapper.MysqlAppTestMapper;
+import com.pxg.app.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +22,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class TestService {
 
-    @Autowired
-    private RabbitProducer rabbitProducer;
 
-    public void test() throws KettleException {
-        KettleInit kettleInit = new KettleInit();
-//        Trans trans=kettleInit.Test();
-//        String lonText= KettleLogStoreLogInfo.getKettleLogStoreLogInfoByLogChannelId(trans.getLogChannelId());
-        rabbitProducer.stringSend2("成功");
-//        rabbitProducer.runKettleFileLog(lonText);
-//        trans.setStopped(true);
+    @Autowired
+    private MysqlAppTestMapper mysqlAppTestMapper;
+
+    @Autowired
+    private KettleFileListMapper kettleFileListMapper;
+
+    public void test() {
+        System.out.println(JsonUtils.ObjectToJSONString(kettleFileListMapper.selectAllByPage(1, 15, 1)));
+
+//        System.out.println(JsonUtils.ObjectToJSONString(mysqlAppTestMapper.getall()));
 
     }
 }

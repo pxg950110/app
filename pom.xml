@@ -316,6 +316,30 @@
             <version>1.6.4</version>
         </dependency>
 
+        <!--        mysql jdbc-->
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+        </dependency>
+
+
+        <!--        jna 动态调用dll-->
+        <!-- https://mvnrepository.com/artifact/com.sun.jna/jna -->
+        <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>3.0.9</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

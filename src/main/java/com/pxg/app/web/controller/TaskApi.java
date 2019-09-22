@@ -2,12 +2,15 @@ package com.pxg.app.web.controller;
 
 import com.pxg.app.core.model.task.TaskCron;
 import com.pxg.app.core.model.task.TaskQuartzSet;
+import com.pxg.app.core.modelutil.KettleFileListAll;
 import com.pxg.app.core.service.TaskServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,4 +57,13 @@ public class TaskApi {
         return taskServer.addTaskQuartzSet(taskQuartzSet);
     }
 
+
+    @PostMapping("/quartz/set/add/list")
+    @ApiOperation("通过list设置定时计划")
+    public Map<Object, Object> setKettleQuartzByList(@RequestBody List<KettleFileListAll> kettleFileListAlls
+            , Date startPlanTime,
+                                                     @RequestParam String cornText
+            , Integer classTypeId) {
+        return taskServer.setKettleQuartzByList(kettleFileListAlls, startPlanTime, cornText, classTypeId);
+    }
 }

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -176,6 +177,70 @@ public class KettleService {
 
 
             return InterfaceReturnInformation(SUCCESS_CODE, kettleFileListAlls, SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * 分页获取数据
+     * @param pageId
+     * @param pageCount
+     * @param status
+     * @return
+     */
+    public Map<Object, Object> getKettleFileListByPage(int pageId,
+                                                       int pageCount,
+                                                       int status) {
+        try {
+
+
+            //包含所有信息的文件
+            List<KettleFileListAll> kettleFileListAlls = kettleFileListMapper.selectAllByPage(pageId, pageCount, status);
+            //获取总页数
+            KettleFileList kettleFileList = new KettleFileList();
+            kettleFileList.setStatus(1);
+            long count = kettleFileListMapper.count(kettleFileList);
+//            long pageNumber=(count%pageCount==0)?(count/pageCount):(count/pageCount+1);
+            Map<Object, Object> map = new HashMap<>();
+            map.put("data", kettleFileListAlls);
+            map.put("pageNumber", count);
+            return InterfaceReturnInformation(SUCCESS_CODE, map, SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * 分页获取数据
+     * @param pageId
+     * @param pageCount
+     * @param status
+     * @return
+     */
+    public Map<Object, Object> getKettleFileListByPageSearch(int pageId,
+                                                             int pageCount,
+                                                             int status, String name) {
+        try {
+
+
+            //包含所有信息的文件
+            List<KettleFileListAll> kettleFileListAlls = kettleFileListMapper.selectAllByPageAndName(pageId, pageCount, status, name);
+//            //获取总页数
+//            KettleFileList kettleFileList=new KettleFileList();
+//            kettleFileList.setStatus(1);
+            long count = kettleFileListMapper.counta(name);
+//            long pageNumber=(count%pageCount==0)?(count/pageCount):(count/pageCount+1);
+            Map<Object, Object> map = new HashMap<>();
+            map.put("data", kettleFileListAlls);
+            map.put("pageNumber", count);
+            return InterfaceReturnInformation(SUCCESS_CODE, map, SUCCESS_MESSAGE);
         } catch (Exception e) {
             log.error(e.getMessage());
             e.printStackTrace();

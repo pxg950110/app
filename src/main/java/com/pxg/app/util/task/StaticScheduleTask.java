@@ -33,7 +33,7 @@ public class StaticScheduleTask {
     private RabbitProducer rabbitProducer;
 
     //添加定时任务
-    @Scheduled(cron = "*/53 * * * * ?")
+    @Scheduled(cron = "*/60 * * * * ?")
     public void configureTask() {
         System.out.println("执行静态任务：" + new Date().toString());
         rabbitProducer.stringSend2("执行静态任务：" + Constant.dateToFormatString(new Date()));

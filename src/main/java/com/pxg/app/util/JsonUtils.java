@@ -1,5 +1,9 @@
 package com.pxg.app.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -14,13 +18,25 @@ package com.pxg.app.util;
  * @description object 与JSON之间相互转换
  */
 public class JsonUtils {
+
+    private static Logger log = LoggerFactory.getLogger(JsonUtils.class);
+
     /**
      * java实体类生成json的String串
      * @param object java实体类
      * @return 返回JSON的string字符串
      */
     public static String ObjectToJSONString(Object object) {
-        return null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonStr = null;
+        try {
+            jsonStr = objectMapper.writeValueAsString(object);
+            return jsonStr;
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return null;
+        }
     }
 
 

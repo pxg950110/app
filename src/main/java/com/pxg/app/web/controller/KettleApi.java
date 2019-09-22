@@ -73,14 +73,24 @@ public class KettleApi {
 
 
     /**
-     * 获取上传文件
+     * 获取上传文件  先禁用
      * @return
      */
-    @GetMapping("/file/all")
-    @ApiOperation("获取所有上传文件")
-    public Map<Object, Object> getKettleFileList() {
-        return kettleService.getKettleFileList();
-    }
+    /**
+     @GetMapping("/file/all")
+     @ApiOperation("获取所有上传文件") public Map<Object, Object> getKettleFileList() {
+     return kettleService.getKettleFileList();
+     }
+     */
 
+    @GetMapping("/file/all/page")
+    @ApiOperation("通过分页获取数据")
+    public Map<Object, Object> getKettleFileListByPage(int pageId,
+                                                       int pageCount,
+                                                       int status, String name) {
+        if (name == null || name.trim().equals(""))
+            return kettleService.getKettleFileListByPage(pageId, pageCount, status);
+        return kettleService.getKettleFileListByPageSearch(pageId, pageCount, status, name);
+    }
 
 }

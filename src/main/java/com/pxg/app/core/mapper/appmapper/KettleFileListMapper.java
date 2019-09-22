@@ -44,4 +44,21 @@ public interface KettleFileListMapper {
      * @mbg.generated Sun Sep 01 17:12:23 CST 2019
      */
     int updateByPrimaryKey(KettleFileList record);
+
+
+    public List<KettleFileListAll> selectAllByPage(@Param("pageId") int pageId,
+                                                   @Param("pageCount") int pageCount,
+                                                   @Param("status") int status);
+
+    public List<KettleFileListAll> selectAllByPageAndName(@Param("pageId") int pageId,
+                                                          @Param("pageCount") int pageCount,
+                                                          @Param("status") int status,
+                                                          @Param("name") String name);
+
+    /**
+     * 通过name 模糊匹配
+     * @param name
+     * @return
+     */
+    long counta(@Param("name") String name);
 }

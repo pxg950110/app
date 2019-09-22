@@ -35,4 +35,12 @@ public class KettleFileListAll {
     public void setAppDict(AppDict appDict) {
         this.appDict = appDict;
     }
+
+    @Override
+    public String toString() {
+        return "KettleFileListAll{" +
+                "kettleFileList=" + kettleFileList +
+                ", appDict=" + appDict +
+                '}';
+    }
 }
