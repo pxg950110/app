@@ -2,7 +2,7 @@ package com.pxg.app.core.service;
 
 import com.pxg.app.core.mapper.appmapper.KettleFileListMapper;
 import com.pxg.app.core.mapper.mysqlappmapper.MysqlAppTestMapper;
-import com.pxg.app.util.JsonUtils;
+import com.pxg.app.util.kettle.KettleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +29,8 @@ public class TestService {
     @Autowired
     private KettleFileListMapper kettleFileListMapper;
 
+
     public void test() {
-        System.out.println(JsonUtils.ObjectToJSONString(kettleFileListMapper.selectAllByPage(1, 15, 1)));
-
-//        System.out.println(JsonUtils.ObjectToJSONString(mysqlAppTestMapper.getall()));
-
+        KettleUtil.runTransformation();
     }
 }
