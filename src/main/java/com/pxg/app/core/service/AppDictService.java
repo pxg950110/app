@@ -2,6 +2,7 @@ package com.pxg.app.core.service;
 
 import com.pxg.app.core.mapper.appmapper.AppDictMapper;
 import com.pxg.app.core.model.dict.AppDict;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,8 @@ import static com.pxg.app.util.constant.Constant.*;
 @Service
 public class AppDictService {
 
+    private static org.slf4j.Logger log = LoggerFactory.getLogger(AppDictService.class);
+
     @Autowired
     private AppDictMapper appDictMapper;
 
@@ -45,4 +48,16 @@ public class AppDictService {
         }
     }
 
+    /**
+     * 获取所有分类
+     */
+    public Map<Object, Object> getAllDictType() {
+        try {
+            return InterfaceReturnInformation(SUCCESS_CODE, appDictMapper.selectAllDictType(), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
 }

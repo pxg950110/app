@@ -1,6 +1,8 @@
 package com.pxg.app.web.controller;
 
+import com.pxg.app.core.model.kmmail.MailInfo;
 import com.pxg.app.core.model.mail.SimpleMailModel;
+import com.pxg.app.core.service.MailServer;
 import com.pxg.app.util.Service.mail.KettleMailServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,6 +40,10 @@ public class WebRestApi {
     @Autowired
     private KettleMailServer kettleMailServer;
 
+
+    @Autowired
+    private MailServer mailServer;
+
     @ApiOperation("发送普通邮件")
     @PostMapping("/send/mail/simple")
     public Map<Object, Object> sendSimpleTextMail(
@@ -56,5 +62,11 @@ public class WebRestApi {
         }
     }
 
+
+    @ApiOperation("增加邮箱")
+    @PostMapping("/mail/info/add")
+    public Map<Object, Object> addMailInfo(@RequestBody MailInfo mailInfo) {
+        return mailServer.addMailInfo(mailInfo);
+    }
 
 }

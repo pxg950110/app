@@ -203,7 +203,7 @@ public class TaskServer {
                 errorCount += 1;
             }
         }
-        Map<Object, Object> map = new HashMap<>();
+        Map<Object, Object> map = new HashMap<Object, Object>();
         map.put("exsitCount", errorCount);
         map.put("exsitList", errorlists);
         map.put("successCount", successCount);

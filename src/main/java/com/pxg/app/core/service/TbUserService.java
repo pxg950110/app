@@ -8,6 +8,7 @@ import com.pxg.app.core.model.user.PermissionRole;
 import com.pxg.app.core.model.user.TbRole;
 import com.pxg.app.core.model.user.TbUser;
 import com.pxg.app.core.modelutil.RegistUserModel;
+import com.pxg.app.util.JsonUtils;
 import com.pxg.app.util.rabbit.RabbitProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,7 @@ public class TbUserService {
      * @return
      */
     public Map<Object, Object> registUser(RegistUserModel registUserModel) {
-        log.info(registUserModel.toString());
+        log.info(JsonUtils.ObjectToJSONString(registUserModel));
         /**
          * 用户注册页面
          */
@@ -87,6 +88,12 @@ public class TbUserService {
         }
         //不存在插入注册数据
         tbUser = registUserModel.getTbUser();
+        if (tbUser.getIsDeleted() == null) {
+            tbUser.setIsDeleted(false);
+        }
+        if (tbUser.getIsLocked() == null) {
+            tbUser.setIsLocked(false);
+        }
         tbUser.setCreateTime(new Date());
         try {
             tbUserMapper.insert(tbUser);
@@ -96,11 +103,11 @@ public class TbUserService {
             permissionRoleMapper.insert(permissionRole);
             return InterfaceReturnInformation(SUCCESS_CODE, null, "注册成功");
         } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
             //失败写入rabbit
-            e.getMessage();
             rabbitProducer.stringSend2(dateToFormatString(new Date()) + "   :" + e.getMessage());
             return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), "查询失败");
-
         }
 
     }
@@ -110,5 +117,18 @@ public class TbUserService {
 
     //  获取  用户权限
 
+
+    //获取用户列表伴随权限
+    public Map<Object, Object> getUserListWithRole(TbUser tbUser) {
+        try {
+
+            return InterfaceReturnInformation(SUCCESS_CODE, tbUserMapper.selectUserWithRoleList(), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+
+        }
+    }
 
 }

@@ -1,5 +1,8 @@
 package com.pxg.app.web.controller;
 
+import com.pxg.app.core.model.kettle.KettleAccessType;
+import com.pxg.app.core.model.kettle.KettleDatabaseType;
+import com.pxg.app.core.model.kettle.KettleRepositoryTable;
 import com.pxg.app.core.model.km.KettleFileList;
 import com.pxg.app.core.modelutil.KettleFileUpload;
 import com.pxg.app.core.service.KettleService;
@@ -93,4 +96,41 @@ public class KettleApi {
         return kettleService.getKettleFileListByPageSearch(pageId, pageCount, status, name);
     }
 
+    @ApiOperation("获取所有kettle数据库类型")
+    @GetMapping("/database/dict/type")
+    public Map<Object, Object> getAllKettleDataBaseType() {
+        return kettleService.getAllKettleDataBaseType();
+    }
+
+    @ApiOperation("有条件的查询数据库类型")
+    @PostMapping("/database/dict/type")
+    public Map<Object, Object> getAllKettleDataBaseType(@RequestBody KettleDatabaseType kettleDatabaseType) {
+        return kettleService.getAllKettleDataBaseType(kettleDatabaseType);
+    }
+
+    @ApiOperation("获取资数据库连接类型")
+    @PostMapping("/database/access/type")
+    public Map<Object, Object> getKettleAccessType(@RequestBody KettleAccessType kettleAccessType) {
+        return kettleService.getKettleAccessType(kettleAccessType);
+    }
+
+    //添加资源库
+    @ApiOperation("添加资源库")
+    @PostMapping("/database/repository/add")
+    public Map<Object, Object> addKetteDataBaseRepository(@RequestBody KettleRepositoryTable kettleRepositoryTable) {
+        return kettleService.addKetteDataBaseRepository(kettleRepositoryTable);
+    }
+
+    @ApiOperation("获取所有资源库")
+    @GetMapping("/database/repository/all/list")
+    public Map<Object, Object> getAllKettleDataBaseRepository() {
+        return kettleService.getAllKettleDataBaseRepository();
+    }
+
+
+    @ApiOperation("检测资源库是否有效")
+    @PostMapping("/database/repository/check/valid")
+    public Map<Object, Object> checkKettleDataBaseRepository(@RequestBody KettleRepositoryTable kettleRepositoryTable) {
+        return kettleService.checkKettleDataBaseRepository(kettleRepositoryTable);
+    }
 }

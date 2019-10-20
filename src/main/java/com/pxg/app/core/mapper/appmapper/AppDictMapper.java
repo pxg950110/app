@@ -41,4 +41,10 @@ public interface AppDictMapper {
     int update(@Param("record") AppDict record);
 
 
+    /**
+     * 获取所有分类
+     */
+    List<AppDict> selectAllDictType();
+
+
 }

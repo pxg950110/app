@@ -1,10 +1,13 @@
 package com.pxg.app.util.rabbit;
 
+import com.pxg.app.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -33,4 +36,9 @@ public class RabbitComsumer {
 
     }
 
+
+    @RabbitListener(queues = "CPUINFO")
+    public void reciveCPUINFO(Map<Object, Object> map) {
+        System.err.println(JsonUtils.ObjectToJSONString(map));
+    }
 }

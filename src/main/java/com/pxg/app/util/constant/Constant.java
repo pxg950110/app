@@ -63,14 +63,24 @@ public class Constant {
     /**
      * 时间转格式化string 字符串
      * 格式：yyyy-MM-dd HH:mm:ss
-     * @param date1
+     * @param date
      * @return yyyy-MM-dd HH:mm:ss
      */
-    public static String dateToFormatString(Date date1) {
+    public static String dateToFormatString(Date date) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return simpleDateFormat.format(date1);
+        return simpleDateFormat.format(date);
     }
 
+    /**
+     * 时间转格式化string 字符串
+     * 格式：HH:mm:ss
+     * @param date
+     * @return yyyy-MM-dd HH:mm:ss
+     */
+    public static String timeToFormatString(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        return simpleDateFormat.format(date);
+    }
     /**
      * 返回时间格式 yyyy-MM-dd
      * @param date

@@ -146,6 +146,13 @@
             </trim>
         </where>
     </select>
+
+    <!--    获取所有字典类型 -->
+    <select id="selectAllDictType" resultMap="BaseResultMap">
+        select distinct classtype, classtype_name
+        from dict.app_dict
+        where status = 1;
+    </select>
     <!--更新数据-->
     <update id="update">
         <if test="record.id != null">

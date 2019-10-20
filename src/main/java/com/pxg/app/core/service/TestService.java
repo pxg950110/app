@@ -2,7 +2,7 @@ package com.pxg.app.core.service;
 
 import com.pxg.app.core.mapper.appmapper.KettleFileListMapper;
 import com.pxg.app.core.mapper.mysqlappmapper.MysqlAppTestMapper;
-import com.pxg.app.util.kettle.KettleUtil;
+import com.pxg.app.util.cpu.CpuInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,6 @@ public class TestService {
 
 
     public void test() {
-        KettleUtil.runTransformation();
+        CpuInfo.getCpuInfo();
     }
 }

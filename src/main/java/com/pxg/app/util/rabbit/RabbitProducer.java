@@ -53,4 +53,8 @@ public class RabbitProducer {
     public void runKettleFileLog(String logText) {
         this.rabbitTemplate.convertAndSend("kettlefilerunstringlog", logText);
     }
+
+    public void SendCPUINFO(Object object) {
+        rabbitTemplate.convertAndSend("EXCHANGESTRING", "CPUDIRECTROUTING", object);
+    }
 }

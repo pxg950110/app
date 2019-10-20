@@ -1,14 +1,19 @@
 package com.pxg.app.core.service;
 
-import com.pxg.app.core.mapper.appmapper.AppDictMapper;
-import com.pxg.app.core.mapper.appmapper.KettleFileListMapper;
+import com.pxg.app.core.mapper.appmapper.*;
+import com.pxg.app.core.model.kettle.KettleAccessType;
+import com.pxg.app.core.model.kettle.KettleDatabaseType;
+import com.pxg.app.core.model.kettle.KettleRepositoryTable;
 import com.pxg.app.core.model.km.KettleFileList;
 import com.pxg.app.core.modelutil.KettleFileListAll;
 import com.pxg.app.core.modelutil.KettleFileUpload;
 import com.pxg.app.util.FileUtil;
+import com.pxg.app.util.JsonUtils;
 import com.pxg.app.util.kettle.KettleInit;
 import com.pxg.app.util.kettle.KettleLogStoreLogInfo;
+import com.pxg.app.util.kettle.KettleRepositoryUtil;
 import com.pxg.app.util.rabbit.RabbitProducer;
+import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
 import org.pentaho.di.trans.Trans;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +55,16 @@ public class KettleService {
 
     @Autowired
     private RabbitProducer rabbitProducer;
+
+    @Autowired
+    private KettleDatabaseTypeMapper kettleDatabaseTypeMapper;
+
+    @Autowired
+    private KettleRepositoryTableMapper kettleRepositoryTableMapper;
+
+    //连接类型
+    @Autowired
+    private KettleAccessTypeMapper kettleAccessTypeMapper;
 
     /**
      * 上传文件 并可执行
@@ -249,14 +264,160 @@ public class KettleService {
     }
 
 
-    public void test() {
-        List<KettleFileList> lists = kettleFileListMapper.selectSelective(new KettleFileList());
-        lists.forEach(this::exe);
-    }
+
 
     public void exe(KettleFileList kettleFileList) {
         System.err.println("aaaaa" + new Date());
     }
 
 
+    /**
+     * 数据库字典相关操作
+     */
+    //查询所有kettle数据库类型
+    public Map<Object, Object> getAllKettleDataBaseType() {
+        try {
+            return InterfaceReturnInformation(SUCCESS_CODE, kettleDatabaseTypeMapper.selectSelective(new KettleDatabaseType()), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * 条件查询数据库类型
+     * @param kettleDatabaseType
+     * @return
+     */
+    public Map<Object, Object> getAllKettleDataBaseType(KettleDatabaseType kettleDatabaseType) {
+        try {
+            return InterfaceReturnInformation(SUCCESS_CODE, kettleDatabaseTypeMapper.selectSelective(kettleDatabaseType), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * *****************资源库相关操作**********************
+     */
+
+    /**
+     * 添加资源库
+     * @param kettleRepositoryTable
+     * @return
+     */
+    public Map<Object, Object> addKetteDataBaseRepository(KettleRepositoryTable kettleRepositoryTable) {
+        try {
+            KettleDatabaseType kettleDatabaseType = new KettleDatabaseType();
+            kettleDatabaseType.setIdDatabaseType((long) kettleRepositoryTable.getkTypeId());
+            //通过id获取name
+            List<KettleDatabaseType> kettleDatabaseTypes = kettleDatabaseTypeMapper.selectSelective(kettleDatabaseType);
+            kettleRepositoryTable.setkTypeName(kettleDatabaseTypes.get(0).getCode());
+//            (String kTypeName, String kHost, String kDb, String kPort, Integer status)
+            //查询数据是否存
+            List<KettleRepositoryTable> kettleRepositoryTables
+                    = kettleRepositoryTableMapper.selectSelective(new KettleRepositoryTable(
+                    kettleRepositoryTable.getkTypeName(),
+                    kettleRepositoryTable.getkHost(),
+                    kettleRepositoryTable.getkDb(),
+                    kettleRepositoryTable.getkPort(),
+                    1
+            ));
+            if (kettleRepositoryTables.size() > 0) {
+                return InterfaceReturnInformation(EXIST_CODE, null, EXIST_MESSAGE);
+            }
+            //通过资源库验证是否有效
+            KettleDatabaseRepository kettleDatabaseRepository
+                    = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
+            //查看资源库是否有效
+            if (kettleDatabaseRepository == null) {
+                return InterfaceReturnInformation(WARN_CODE, "数据无效", WARN_MESSAGE);
+            }
+
+
+            kettleRepositoryTable.setStatus(1);
+            kettleRepositoryTable.setCreateTime(new Date());
+            kettleRepositoryTableMapper.insert(kettleRepositoryTable);
+            //返回成功标识
+            return InterfaceReturnInformation(SUCCESS_CODE, null, SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info(e.getMessage());
+            //返回错误信息
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+
+    }
+
+
+    /**
+     * 获取所有资源库信息
+     * @return
+     */
+    public Map<Object, Object> getAllKettleDataBaseRepository() {
+        try {
+            return InterfaceReturnInformation(SUCCESS_CODE, kettleRepositoryTableMapper.selectSelective(new KettleRepositoryTable()), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * 检测资源库是否有效
+     * @param kettleRepositoryTable
+     * @return
+     */
+    public Map<Object, Object> checkKettleDataBaseRepository(KettleRepositoryTable kettleRepositoryTable) {
+        try {
+            KettleDatabaseRepository kettleDatabaseRepository = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
+            if (kettleDatabaseRepository == null) {
+                return InterfaceReturnInformation(WARN_CODE, false, WARN_MESSAGE);
+            } else {
+                return InterfaceReturnInformation(SUCCESS_CODE, true, SUCCESS_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+
+    /**
+     * 有条件获取连接类型
+     * @param kettleAccessType
+     * @return
+     */
+    public Map<Object, Object> getKettleAccessType(KettleAccessType kettleAccessType) {
+        try {
+            if (kettleAccessType == null)
+                kettleAccessType = new KettleAccessType();
+            log.info(JsonUtils.ObjectToJSONString(kettleAccessType));
+            List<KettleAccessType> kettleAccessTypes = kettleAccessTypeMapper.selectSelective(kettleAccessType);
+            return InterfaceReturnInformation(SUCCESS_CODE, kettleAccessTypes, SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+    public void test() {
+        KettleRepositoryTable kettleRepositoryTable = new KettleRepositoryTable();
+        kettleRepositoryTable.setId(3);
+        List<KettleRepositoryTable> repositoryTables = kettleRepositoryTableMapper.selectSelective(kettleRepositoryTable);
+        kettleRepositoryTable = repositoryTables.get(0);
+        System.out.println(kettleRepositoryTable);
+        //获取
+        KettleDatabaseRepository kettleDatabaseRepository = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
+        KettleRepositoryUtil.getKettleDatabaseRepositoryFileList(kettleDatabaseRepository);
+    }
 }

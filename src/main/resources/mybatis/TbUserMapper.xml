@@ -14,6 +14,24 @@
         <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
         <result column="is_locked" jdbcType="BIT" property="isLocked"/>
     </resultMap>
+
+
+    <resultMap id="UserWithRoleResultMap" type="com.pxg.app.core.modelutil.RegistUserModel">
+        <association property="tbUser" javaType="com.pxg.app.core.model.user.TbUser">
+            <id column="id" jdbcType="INTEGER" property="id"/>
+            <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+            <result column="user_password" jdbcType="VARCHAR" property="userPassword"/>
+            <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+            <result column="is_deleted" jdbcType="BIT" property="isDeleted"/>
+            <result column="is_locked" jdbcType="BIT" property="isLocked"/>
+        </association>
+        <association property="tbRole" javaType="com.pxg.app.core.model.user.TbRole">
+            <id column="rid" jdbcType="INTEGER" property="rid"/>
+            <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
+            <result column="note" jdbcType="VARCHAR" property="note"/>
+        </association>
+    </resultMap>
+
     <sql id="Tbuser_Where_Clause">
         <!--
           WARNING - @mbg.generated
@@ -52,6 +70,15 @@
         -->
         id, user_name, user_password, create_time, is_deleted, is_locked
     </sql>
+
+
+    <select id="selectUserWithRoleList" resultMap="UserWithRoleResultMap">
+        select u.id, u.user_name, u.create_time, u.is_deleted, u.is_locked, r.*
+        from appuser.tb_user u
+                 inner join appuser.permission_role p on u.id = p.user_id
+                 inner join appuser.tb_role r on p.role_id = r.rid
+        where (u.is_deleted = false)
+    </select>
 
     <!--id不插入-->
     <insert id="insert" parameterType="com.pxg.app.core.model.user.TbUser"

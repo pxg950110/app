@@ -1,14 +1,11 @@
 package com.pxg.app.util.task;
 
-import com.pxg.app.util.constant.Constant;
+import com.pxg.app.core.mapper.appmapper.TbMemoryRecordMapper;
 import com.pxg.app.util.rabbit.RabbitProducer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -32,11 +29,13 @@ public class StaticScheduleTask {
     @Autowired
     private RabbitProducer rabbitProducer;
 
+    @Autowired
+    private TbMemoryRecordMapper tbMemoryRecordMapper;
     //添加定时任务
-    @Scheduled(cron = "*/60 * * * * ?")
-    public void configureTask() {
-        System.out.println("执行静态任务：" + new Date().toString());
-        rabbitProducer.stringSend2("执行静态任务：" + Constant.dateToFormatString(new Date()));
-    }
+//    @Scheduled(cron = "*/3 * * * * ?")
+//    public void configureTask() throws IOException {
+////        tbMemoryRecordMapper.insert(CpuInfo.getServerMemoryRecord());
+//        WebSocketServer.sendInfo(JsonUtils.ObjectToJSONString(CpuInfo.getServerMemoryRecord()),"sid123");
+//    }
 
 }

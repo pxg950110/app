@@ -1,5 +1,6 @@
 package com.pxg.app.web.controller;
 
+import com.pxg.app.core.model.user.TbUser;
 import com.pxg.app.core.modelutil.RegistUserModel;
 import com.pxg.app.core.service.TbUserService;
 import io.swagger.annotations.Api;
@@ -57,6 +58,17 @@ public class WebUserApi {
     @ApiOperation("用户注册接口")
     public Map<Object, Object> registUser(@RequestBody RegistUserModel registUserModel) {
         return tbUserService.registUser(registUserModel);
+    }
+
+
+    /**
+     * 获取所有用户列表
+     * @return
+     */
+    @ApiOperation("获取用户伴随权限")
+    @GetMapping("/list/with/role")
+    public Map<Object, Object> getUserListWithRole() {
+        return tbUserService.getUserListWithRole(new TbUser());
     }
 
 }
