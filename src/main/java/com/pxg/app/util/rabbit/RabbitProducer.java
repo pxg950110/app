@@ -57,4 +57,9 @@ public class RabbitProducer {
     public void SendCPUINFO(Object object) {
         rabbitTemplate.convertAndSend("EXCHANGESTRING", "CPUDIRECTROUTING", object);
     }
+
+    //DATABASEJOBRUNINFO
+    public void sendDatabaseJobRunInfo(Object object) {
+        rabbitTemplate.convertAndSend("EXCHANGESTRING", "CPUDIRECTROUTING2", object);
+    }
 }

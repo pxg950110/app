@@ -45,6 +45,27 @@ public class RabbitmqConfig {
         return new Queue(CPUINFO, true);//true 持久
     }
 
+    @Bean
+    public Queue DataBaseJobRunInfo() {
+        return new Queue("DATABASEJOBRUNINFO");
+    }
+
+    //日志队列和交换机绑定
+    @Bean
+    Binding bindingDirect2() {
+        return BindingBuilder.bind(DataBaseJobRunInfo())
+                .to(directExchange())
+                .with("CPUDIRECTROUTING2");
+    }
+    /**
+     *
+     * @return
+     */
+    //直连交换机
+
+    /**
+     * @return
+     */
     //直连交换机
     @Bean
     DirectExchange directExchange() {

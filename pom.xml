@@ -130,7 +130,6 @@
             <version>3.4.6</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
@@ -155,7 +154,11 @@
             <version>5.0.8.RELEASE</version>
         </dependency>
 
-        <!--定时工具quartz-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <!--        定时工具quartz-->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
@@ -322,7 +325,17 @@
             <artifactId>oshi-core</artifactId>
             <version>4.0.0</version>
         </dependency>
-        <!--        mysql jdbc-->
+
+
+        <!--        kettle连接要求5.1.46版本的mysql-->
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.0.8</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
@@ -330,13 +343,11 @@
             <version>8.0.17</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.4</version>
-        </dependency>
-
-
+        <!--        <dependency>-->
+        <!--            <groupId>net.sf.json-lib</groupId>-->
+        <!--            <artifactId>json-lib</artifactId>-->
+        <!--            <version>2.4</version>-->
+        <!--        </dependency>-->
         <!--        jna 动态调用dll-->
         <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
         <dependency>

@@ -1,6 +1,7 @@
 package com.pxg.app.util.constant;
 
 
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,7 +41,20 @@ public class Constant {
     public static final String WARN_MESSAGE = "警告信息";
     public static final String ERROR_MESSAGE = "失败";
 
-    public static final String aa = "";
+    /**
+     * 转换
+     */
+    public static final String TYPE_TRANSFORMATION = "transformation";
+    public static final String TYPE_JOB = "job";
+    public static final String TYPE_FILE = "file";
+
+    /**
+     * 任务来源类型
+     */
+    //文件
+    public static final String CLASSTYPE_FILE = "file";
+    //资源库
+    public static final String CLASSTYPE_REPOSITORY = "repository";
 
     //过期时间60分钟
 //    public  static final longEXPIRE_TIME = 60*60*1000;
@@ -90,5 +104,16 @@ public class Constant {
         return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }
 
+
+    public static Date strToDate(String strDate) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        ParsePosition pos = new ParsePosition(0);
+        Date date = simpleDateFormat.parse(strDate, pos);
+        return date;
+    }
+
+    public static long dateToLong(Date date) {
+        return date.getTime();
+    }
     
 }

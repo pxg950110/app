@@ -81,7 +81,8 @@ public class AppDatabaseConfigApp {
     //SqlSessionTemplate
     @Bean("appSqlSessionTemplate")
     @Primary
-    public SqlSessionTemplate appSqlSessionTemplate(@Qualifier("appSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+    public SqlSessionTemplate appSqlSessionTemplate(@Qualifier("appSqlSessionFactory")
+                                                            SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 

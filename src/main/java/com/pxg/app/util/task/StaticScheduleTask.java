@@ -31,11 +31,6 @@ public class StaticScheduleTask {
 
     @Autowired
     private TbMemoryRecordMapper tbMemoryRecordMapper;
-    //添加定时任务
-//    @Scheduled(cron = "*/3 * * * * ?")
-//    public void configureTask() throws IOException {
-////        tbMemoryRecordMapper.insert(CpuInfo.getServerMemoryRecord());
-//        WebSocketServer.sendInfo(JsonUtils.ObjectToJSONString(CpuInfo.getServerMemoryRecord()),"sid123");
-//    }
+
 
 }

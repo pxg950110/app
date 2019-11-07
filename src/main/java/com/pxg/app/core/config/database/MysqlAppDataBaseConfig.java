@@ -44,7 +44,6 @@ public class MysqlAppDataBaseConfig {
     public DataSource appDataSource() {
         return DataSourceBuilder.create().build();
     }
-
     /**
      * 配置session工厂
      * @param dataSource
@@ -62,7 +61,6 @@ public class MysqlAppDataBaseConfig {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean.setMapperLocations(resolver.getResources("classpath*:/mybatis-mysql/**Mapper.xml"));
         return sqlSessionFactoryBean.getObject();
-
     }
 
 
@@ -82,7 +80,8 @@ public class MysqlAppDataBaseConfig {
     //SqlSessionTemplate
     @Bean("mysqlappSqlSessionTemplate")
 //    @Primary
-    public SqlSessionTemplate appSqlSessionTemplate(@Qualifier("mysqlappSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+    public SqlSessionTemplate appSqlSessionTemplate(@Qualifier("mysqlappSqlSessionFactory")
+                                                            SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 

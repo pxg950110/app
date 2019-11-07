@@ -5,14 +5,17 @@ import com.pxg.app.core.model.kettle.KettleAccessType;
 import com.pxg.app.core.model.kettle.KettleDatabaseType;
 import com.pxg.app.core.model.kettle.KettleRepositoryTable;
 import com.pxg.app.core.model.km.KettleFileList;
+import com.pxg.app.core.model.task.TaskQuartzSet;
 import com.pxg.app.core.modelutil.KettleFileListAll;
 import com.pxg.app.core.modelutil.KettleFileUpload;
+import com.pxg.app.kettle.model.KettleRepositoryDataInfo;
 import com.pxg.app.util.FileUtil;
 import com.pxg.app.util.JsonUtils;
 import com.pxg.app.util.kettle.KettleInit;
 import com.pxg.app.util.kettle.KettleLogStoreLogInfo;
 import com.pxg.app.util.kettle.KettleRepositoryUtil;
 import com.pxg.app.util.rabbit.RabbitProducer;
+import org.pentaho.di.repository.LongObjectId;
 import org.pentaho.di.repository.kdr.KettleDatabaseRepository;
 import org.pentaho.di.trans.Trans;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,20 @@ public class KettleService {
     //连接类型
     @Autowired
     private KettleAccessTypeMapper kettleAccessTypeMapper;
+
+    @Autowired
+    private TaskQuartzSetMapper taskQuartzSetMapper;
+
+    public void test() {
+        KettleRepositoryTable kettleRepositoryTable = new KettleRepositoryTable();
+        kettleRepositoryTable.setId(3);
+        List<KettleRepositoryTable> repositoryTables = kettleRepositoryTableMapper.selectSelective(kettleRepositoryTable);
+        kettleRepositoryTable = repositoryTables.get(0);
+        System.out.println(kettleRepositoryTable);
+        //获取
+        KettleDatabaseRepository kettleDatabaseRepository = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
+        KettleRepositoryUtil.runKettleDatabaseTransformation(new LongObjectId(1), kettleDatabaseRepository);
+    }
 
     /**
      * 上传文件 并可执行
@@ -264,8 +281,6 @@ public class KettleService {
     }
 
 
-
-
     public void exe(KettleFileList kettleFileList) {
         System.err.println("aaaaa" + new Date());
     }
@@ -410,14 +425,144 @@ public class KettleService {
         }
     }
 
-    public void test() {
-        KettleRepositoryTable kettleRepositoryTable = new KettleRepositoryTable();
-        kettleRepositoryTable.setId(3);
-        List<KettleRepositoryTable> repositoryTables = kettleRepositoryTableMapper.selectSelective(kettleRepositoryTable);
-        kettleRepositoryTable = repositoryTables.get(0);
-        System.out.println(kettleRepositoryTable);
-        //获取
-        KettleDatabaseRepository kettleDatabaseRepository = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
-        KettleRepositoryUtil.getKettleDatabaseRepositoryFileList(kettleDatabaseRepository);
+
+    public Map<Object, Object> getKettleDatabaseRepostoryInfoListById(Integer id) {
+        //查询资源库
+        KettleRepositoryTable kettleRepositoryTable = kettleRepositoryTableMapper.selectByPrimaryKey(id);
+        KettleDatabaseRepository kettleDatabaseRepository = null;
+        try {
+            kettleDatabaseRepository = KettleRepositoryUtil.kettleDatabaseRepository(kettleRepositoryTable);
+        } catch (Exception e) {
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+        //判断是否有效
+        if (kettleDatabaseRepository == null) {
+            return InterfaceReturnInformation(WARN_CODE, "资源库不存在", WARN_MESSAGE);
+        }
+        //获取资源库相关信息
+        try {
+            return InterfaceReturnInformation(SUCCESS_CODE, KettleRepositoryUtil.getKettleDatabaseRepostoryInfoList(kettleDatabaseRepository), SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
     }
+
+    /**
+     * 获取kettle资源库中单个job或者transformation的xml内容
+     * 获取相关信息v1.0版本只查询xml文件
+     * v2.0版本查询所有步骤及相关信息
+     * @param dataInfo
+     * @param repositoryId
+     * @return
+     */
+    public Map<Object, Object> getJobOrTransformationInfo(KettleRepositoryDataInfo dataInfo, Integer repositoryId) {
+        try {
+            KettleDatabaseRepository repository =
+                    KettleRepositoryUtil.kettleDatabaseRepository(
+                            kettleRepositoryTableMapper.selectByPrimaryKey(repositoryId));
+            if (repository == null) {
+                return InterfaceReturnInformation(WARN_CODE, "数据内容错误", WARN_MESSAGE);
+            }
+            String objectType = dataInfo.getObjectType();
+            //判断类型 job transformation
+            String res = null;
+            if ("job".equals(objectType)) {
+                res = KettleRepositoryUtil.getJobInfo(new LongObjectId(Long.parseLong(dataInfo.getObjectId())),
+                        repository);
+            } else if ("transformation".equals(objectType)) {
+                res = KettleRepositoryUtil.getTransformation(new LongObjectId(Long.parseLong(dataInfo.getObjectId())),
+                        repository);
+            }
+            if (res == null) {
+                return InterfaceReturnInformation(WARN_CODE, "数据内容错误", WARN_MESSAGE);
+            }
+            return InterfaceReturnInformation(SUCCESS_CODE, res, SUCCESS_MESSAGE);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * <p>
+     * 执行 资源库中的工程
+     * </p>
+     * @param kettleRepositoryDataInfo
+     * @param repositoryId
+     * @return
+     */
+    public Map<Object, Object> runKettleDatabaseJobOrTransformation(
+            KettleRepositoryDataInfo kettleRepositoryDataInfo,  //资源库中的文件objectId
+            Integer repositoryId
+    ) {
+        Map<Object, Object> map = new HashMap<>();
+        map.put("jobType", kettleRepositoryDataInfo.getObjectType());
+        //通过资源库id获取资源库
+        KettleDatabaseRepository repository =
+                KettleRepositoryUtil
+                        .kettleDatabaseRepository(
+                                kettleRepositoryTableMapper
+                                        .selectByPrimaryKey(repositoryId)
+                        );
+        //分类别执行
+        if (kettleRepositoryDataInfo.getObjectType().equals(TYPE_TRANSFORMATION)) {
+            try {
+                map = KettleRepositoryUtil.runKettleDatabaseTransformation(
+                        new LongObjectId(Long.parseLong(kettleRepositoryDataInfo.getObjectId())), repository);
+
+                map.put("repositoyId", repositoryId);
+                rabbitProducer.sendDatabaseJobRunInfo(map);
+                return InterfaceReturnInformation(SUCCESS_CODE,
+                        map, SUCCESS_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+            }
+        } else if (kettleRepositoryDataInfo.getObjectType().equals(TYPE_JOB)) {
+            try {
+                map = KettleRepositoryUtil.runKettleDatabaseJob(
+                        new LongObjectId(Long.parseLong(kettleRepositoryDataInfo.getObjectId())), repository
+                );
+                rabbitProducer.sendDatabaseJobRunInfo(map);
+                return InterfaceReturnInformation(SUCCESS_CODE,
+                        map, SUCCESS_MESSAGE);
+            } catch (Exception e) {
+                return InterfaceReturnInformation(ERROR_CODE, e.getMessage(), ERROR_MESSAGE);
+            }
+        } else {
+            return InterfaceReturnInformation(WARN_CODE,
+                    "任务类型执行错误", WARN_MESSAGE);
+        }
+    }
+
+    /**
+     * 通过
+     */
+    public Map<Object, Object> runKettleTaskInfo(TaskQuartzSet taskQuartzSet) {
+
+        Map<Object, Object> map = new HashMap<>();
+        //通过任务类型判断执行哪一个
+        if (taskQuartzSet.getClassType().equals(CLASSTYPE_FILE)) {
+            map.put("error", "暂不处理");
+        } else if (taskQuartzSet.getClassType().equals(CLASSTYPE_REPOSITORY)) {
+
+
+            KettleRepositoryDataInfo kettleRepositoryDataInfo = new KettleRepositoryDataInfo();
+            kettleRepositoryDataInfo.setObjectId(String.valueOf(taskQuartzSet.getJobId()));
+            kettleRepositoryDataInfo.setObjectType(taskQuartzSet.getJobType());
+            //执行定时任务
+            map = runKettleDatabaseJobOrTransformation(kettleRepositoryDataInfo, taskQuartzSet.getRepositoryId());
+        }
+        return map;
+    }
+
+    /**
+     * 资源库的job执行次数+1
+     */
+    public void addTaskQuartzTimes(TaskQuartzSet taskQuartzSet) {
+        taskQuartzSetMapper.addRunTimes(taskQuartzSet);
+    }
+
 }

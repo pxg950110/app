@@ -69,6 +69,8 @@ public class TbUserService {
                 "查询成功");
     }
 
+    //用户修改的接口 v1.0版本禁用
+
     /**
      * 用户注册接口
      * @return

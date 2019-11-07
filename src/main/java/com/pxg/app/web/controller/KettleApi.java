@@ -6,6 +6,7 @@ import com.pxg.app.core.model.kettle.KettleRepositoryTable;
 import com.pxg.app.core.model.km.KettleFileList;
 import com.pxg.app.core.modelutil.KettleFileUpload;
 import com.pxg.app.core.service.KettleService;
+import com.pxg.app.kettle.model.KettleRepositoryDataInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -75,6 +76,7 @@ public class KettleApi {
     }
 
 
+
     /**
      * 获取上传文件  先禁用
      * @return
@@ -132,5 +134,36 @@ public class KettleApi {
     @PostMapping("/database/repository/check/valid")
     public Map<Object, Object> checkKettleDataBaseRepository(@RequestBody KettleRepositoryTable kettleRepositoryTable) {
         return kettleService.checkKettleDataBaseRepository(kettleRepositoryTable);
+    }
+
+
+    @ApiOperation("获取资源库中信息")
+    @GetMapping("/database/repository/info/list/{id}")
+    public Map<Object, Object> getKettleDatabaseRepostoryInfoListById(@PathVariable("id") Integer id) {
+        return kettleService.getKettleDatabaseRepostoryInfoListById(id);
+    }
+
+
+    /**
+     * @param dataInfo
+     * @param repositoryId
+     * @return
+     */
+    @PostMapping("/database/repository/info/{repositoryId}/jobortrans/info")
+    @ApiOperation("获取资源库中的job或者transformation")
+    public Map<Object, Object> getJobOrTransformationInfo(@RequestBody KettleRepositoryDataInfo dataInfo,
+                                                          @PathVariable("repositoryId") Integer repositoryId) {
+        return kettleService.getJobOrTransformationInfo(dataInfo, repositoryId);
+    }
+
+    @PostMapping("/database/repository/run/{repositoryId}/jobortrans")
+    @ApiOperation("执行资源库中的job或者transformation")
+    public Map<Object, Object> runKettleDatabaseJobOrTransformation(
+            @RequestBody KettleRepositoryDataInfo kettleRepositoryDataInfo,  //资源库中的文件objectId
+            @PathVariable("repositoryId") Integer repositoryId
+    ) {
+        return kettleService.runKettleDatabaseJobOrTransformation(
+                kettleRepositoryDataInfo,
+                repositoryId);
     }
 }

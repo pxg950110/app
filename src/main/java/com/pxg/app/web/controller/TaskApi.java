@@ -1,17 +1,16 @@
 package com.pxg.app.web.controller;
 
-import com.pxg.app.core.model.task.TaskCron;
 import com.pxg.app.core.model.task.TaskQuartzSet;
-import com.pxg.app.core.modelutil.KettleFileListAll;
+import com.pxg.app.core.service.ScheduledTaskService;
+import com.pxg.app.core.service.TaskQuartzServer;
 import com.pxg.app.core.service.TaskServer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -33,37 +32,75 @@ public class TaskApi {
     @Autowired
     private TaskServer taskServer;
 
-    @ApiOperation("增加定时策略")
-    @PostMapping("/cron/add")
-    public Map<Object, Object> addCorn(@RequestBody TaskCron taskCron) {
-        return taskServer.addCorn(taskCron);
+    @Autowired
+    private ScheduledTaskService scheduledTaskService;
+
+    @Autowired
+    private TaskQuartzServer taskQuartzServer;
+
+    @ApiOperation("注册定时任务")
+    @PostMapping("/add/task/regist")
+    public Map<Object, Object> addTaskByKey(@RequestBody TaskQuartzSet taskQuartzSet) {
+        return taskServer.addTaskByKey(taskQuartzSet);
     }
 
-    @ApiOperation("通过状态获取定时策略")
-    @GetMapping("/cron/all")
-    public Map<Object, Object> getCronAll(Integer status) {
-        return taskServer.getCronAll(status);
+
+    @GetMapping("/all/list")
+    @ApiOperation("获取所有定时任务列表")
+    public Map<Object, Object> getAllTaskQuartzSet() {
+        return taskQuartzServer.getAllTaskQuartzSet();
     }
 
     /**
-     * 每个任务只允许设置一次定时策略
-     * @param taskQuartzSet
-     * @return
+     * 根据任务key => 启动任务
      */
-    //注册定时任务
-    @ApiOperation("注册单挑定时任务")
-    @PostMapping("/quartz/set/add")
-    public Map<Object, Object> addTaskQuartzSet(@RequestBody TaskQuartzSet taskQuartzSet) {
-        return taskServer.addTaskQuartzSet(taskQuartzSet);
+    @GetMapping("/start")
+    public String start(@RequestParam("taskKey") String taskKey) {
+        scheduledTaskService.start(taskKey);
+        return "start success";
+    }
+
+    /**
+     * 根据任务key => 停止任务
+     */
+    @GetMapping("/stop")
+    public String stop(@RequestParam("taskKey") String taskKey) {
+        if (taskQuartzServer.stop(taskKey)) {
+            return "stop success";
+        }
+        return "stop error";
     }
 
 
-    @PostMapping("/quartz/set/add/list")
-    @ApiOperation("通过list设置定时计划")
-    public Map<Object, Object> setKettleQuartzByList(@RequestBody List<KettleFileListAll> kettleFileListAlls
-            , Date startPlanTime,
-                                                     @RequestParam String cornText
-            , Integer classTypeId) {
-        return taskServer.setKettleQuartzByList(kettleFileListAlls, startPlanTime, cornText, classTypeId);
+    //增加任务
+
+    @GetMapping("/start2")
+    public String start2(@RequestParam("taskKey") String taskKey) {
+        taskQuartzServer.start(taskKey);
+        return "stop success";
+    }
+
+    /**
+     * 根据任务key => 重启任务
+     */
+    @GetMapping("/restart")
+    public String restart(@RequestParam("taskKey") String taskKey) {
+        scheduledTaskService.restart(taskKey);
+        return "restart success";
+    }
+
+    @GetMapping("/printlnTask")
+    public String printlnTask() {
+        return scheduledTaskService.printlnTask();
+    }
+
+
+    /**
+     * 获取所有正在执行的定时任务
+     * @return
+     */
+    @GetMapping("/quartz/job/all")
+    public Set getAll() {
+        return taskQuartzServer.getAll();
     }
 }
