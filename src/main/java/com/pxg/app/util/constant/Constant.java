@@ -61,6 +61,31 @@ public class Constant {
 
 
     /**
+     * RabbitMQ相关队列的定义
+     */
+    public static final String RABBITMQ_TASK_LOG_INFO = "RABBITMQ_TASK_LOG_INFO";
+
+    /**
+     * 基本日志
+     */
+    public static final String RABBITMQ_SERVER_INFO = "RABBITMQ_SERVER_INFO";
+    /**
+     * 交换机
+     */
+    public static final String EXCHANGESTRING = "EXCHANGESTRING";
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
      * 接口返回信息
      */
     public static Map<Object, Object> InterfaceReturnInformation(int code,//

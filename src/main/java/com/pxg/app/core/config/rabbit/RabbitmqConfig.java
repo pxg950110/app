@@ -9,6 +9,9 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.pxg.app.util.constant.Constant.RABBITMQ_SERVER_INFO;
+import static com.pxg.app.util.constant.Constant.RABBITMQ_TASK_LOG_INFO;
+
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -49,6 +52,52 @@ public class RabbitmqConfig {
     public Queue DataBaseJobRunInfo() {
         return new Queue("DATABASEJOBRUNINFO");
     }
+
+
+    /**
+     * 程序运行日志
+     * @return
+     */
+    @Bean
+    public Queue RABBITMQ_SERVER_INFO() {
+        return new Queue(RABBITMQ_SERVER_INFO);
+    }
+
+    /**
+     * 任务执行日志
+     * @return
+     */
+    @Bean
+    public Queue RABBITMQ_TASK_LOG_INFO() {
+        return new Queue(RABBITMQ_TASK_LOG_INFO);
+    }
+
+    /**
+     * 日志和交换机绑定
+     * @return
+     */
+    @Bean
+    public Binding RABBITMQ_TASK_LOG_INFOBINDING() {
+        return BindingBuilder.bind(RABBITMQ_TASK_LOG_INFO())
+                .to(directExchange())
+                .with(RABBITMQ_TASK_LOG_INFO);
+    }
+
+    /**
+     * 程序运行日志绑定交换机
+     * @return
+     */
+    @Bean
+    public Binding RABBITMQ_SERVER_INFOBINDING() {
+        return BindingBuilder.bind(RABBITMQ_SERVER_INFO())
+                .to(directExchange())
+                .with(RABBITMQ_SERVER_INFO);
+    }
+
+
+    /**
+     * @return
+     */
 
     //日志队列和交换机绑定
     @Bean

@@ -6,6 +6,7 @@ import com.pxg.app.core.model.task.TaskQuartzSet;
 import com.pxg.app.util.JsonUtils;
 import com.pxg.app.util.constant.Constant;
 import com.pxg.app.util.quartz.QuartzFactory;
+import com.pxg.app.util.rabbit.RabbitProducer;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class TaskQuartzServer {
     private static Logger log = LoggerFactory.getLogger(TaskQuartzServer.class);
 
     @Autowired
+    private RabbitProducer rabbitProducer;
+    @Autowired
     private org.quartz.Scheduler scheduler;
 
     //任务mapper
@@ -59,15 +62,27 @@ public class TaskQuartzServer {
      */
     public Boolean start(String taskKey) {
         try {
+            rabbitProducer.RABBITMQ_TASK_LOG_INFO(this.getClass().toString() + ">>>>"
+                    + Constant.dateToFormatString(new Date()) + ">>>>启动定时任务");
             //启动调度器
             scheduler.start();
+            rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                    + Constant.dateToFormatString(new Date()) + ">>>>启动调度器");
             //通过 taskKey确定任务是否已执行
             JobKey jobKey = new JobKey(taskKey);
+            rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                    + Constant.dateToFormatString(new Date()) + ">>>>通过 taskKey确定任务是否已执行");
             //通过数据库中的id执行任务
             if (scheduler.checkExists(jobKey)) {
                 log.info("任务id：{} 已存在", taskKey);
+                rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                        + Constant.dateToFormatString(new Date()) + ">>>>任务id：" + taskKey + "已存在");
+                rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                        + Constant.dateToFormatString(new Date()) + ">>>>结束");
                 return false;
             }
+            rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                    + Constant.dateToFormatString(new Date()) + ">>>>查询任务执行相关内容");
             //根据
             //查询任务执行相关内容
             TaskQuartzSet taskQuartzSet = taskQuartzSetMapper.selectByPrimaryKey(
@@ -78,7 +93,6 @@ public class TaskQuartzServer {
             jobDataMap.put("jobInfo", taskQuartzSet);
             //获取corn
             String cornString = taskCronMapper.selectByPrimaryKey(taskQuartzSet.getCronId()).getcron();
-
             // 构建Job信息  只执行一个类
             JobDetail jobDetail = JobBuilder.newJob(QuartzFactory.class).withIdentity(
                     //任务taskKey,
@@ -104,6 +118,8 @@ public class TaskQuartzServer {
 
             log.info("定时任务创建完毕");
 
+            rabbitProducer.RABBITMQ_TASK_LOG_INFO(TaskQuartzServer.class.toString() + ">>>>"
+                    + Constant.dateToFormatString(new Date()) + ">>>>定时任务创建完毕");
             //v1.0版本 设置is_run为1
             taskQuartzSet.setIsRun(1);
             taskQuartzSetMapper.updateByPrimaryKeySelective(taskQuartzSet);

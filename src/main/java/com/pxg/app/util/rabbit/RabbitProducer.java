@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.pxg.app.util.constant.Constant.EXCHANGESTRING;
+import static com.pxg.app.util.constant.Constant.RABBITMQ_TASK_LOG_INFO;
+
 /**
  * Copyright (c) 2019. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
  * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
@@ -62,4 +65,14 @@ public class RabbitProducer {
     public void sendDatabaseJobRunInfo(Object object) {
         rabbitTemplate.convertAndSend("EXCHANGESTRING", "CPUDIRECTROUTING2", object);
     }
+
+
+    /**
+     * 定时任务操作时日志
+     * @param object
+     */
+    public void RABBITMQ_TASK_LOG_INFO(Object object) {
+        rabbitTemplate.convertAndSend(EXCHANGESTRING, RABBITMQ_TASK_LOG_INFO, object);
+    }
+
 }
